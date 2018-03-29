@@ -1,5 +1,6 @@
 package com.example.maddiemaniaci.lab6;
 
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -22,6 +23,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        Intent intent = getIntent();
+        mLastLocation = intent.getExtras().getParcelable("Location");
+        currentPos = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude);
+
     }
 
 
