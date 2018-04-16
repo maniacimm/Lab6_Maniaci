@@ -16,6 +16,7 @@ import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mapButton = findViewById(R.layout.activity_main);
+        mapButton = findViewById(R.id.MyLocationButton);
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
@@ -40,10 +41,32 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     .addApi(LocationServices.API)
                     .build();
         }
+
+        mapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (checkLocationPermission()) {
+                    launchMap();
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        this.mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        this.mGoogleApiClient.disconnect();
     }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        Log.i("Google API", "connected");
         boolean permissionGranted = checkLocationPermission();
 
         if (permissionGranted) {
@@ -58,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-
 
             // Request the permission.
             ActivityCompat.requestPermissions(this,
@@ -113,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         Log.i("MAIN", "Connection Failed");
     }
 
-    public void launchMap(View view) {
+    public void launchMap() {
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("Location", mLastLocation);
         startActivity(intent);
